@@ -1,13 +1,10 @@
 ---
-title: "ISYE6501_Homework 5"
-author: "IL"
+
 date: "9/23/2020"
 output: html_document
 ---
 ##  Question 8.1 Describe a situation or problem from your job, everyday life, current events, etc., for which a linear regression model would be appropriate. List some (up to 5) predictors that you might use.
 
-I work in energy sector and we have to predict the prices of electricity since most of the utilities in California don't own power generation and they buy electricity from CAISO that manages 4,599 actives node energy market. ISO manages California wholesale electricity.
-As consumer, the price of electricity is fixed, but utilities have some variations of the price and they have to purchase electricity a day ahead to provide balance in the grid. Linear regression helps explain variables that impact the electricity prices. the  5 predictors are: weather, power plants generation, fuel costs, renewable generation, loads.
 
 
 
@@ -67,7 +64,7 @@ print(BIC_3)
 ```
 
 
-## Alnalysis 
+## Analysis 
 
 For the first model, including all predictors and crime is the response variable, the R-squared is 0.8031 which estimate the variability of the model and the adjusted R squared is 0.7078. The predicted value for for the first model is 155 which is below the minimum value we have in the model for the crime rate and the SSE is 1354946. Another method to help looking at which predictors are not meaningful to the datasets is the p-value; So, Po1,Po2,LF,M.F, Pop, NW, U1, Wealth have passed the 0.05 of p-value treshold. In the second model, I used cook's distance to find outliers within the datasets, which were excluded in the second linear regression model resulting in R-squared is 0.8986, adjusted R-squared is 0.8443, and less predictors that have high p-value than 0.05, the predicted model is 1043.11. The third model, I excluded the higher p-value predictors that were generated in the first model to understand if they were overfitting the model, resulting in R-squared is 0.3565 and adjusted R-squared 0.278, the model produced two predictors that were higher than 0.05 p-value. it is still unclear to have an answer about which predictors affect the model.
 
