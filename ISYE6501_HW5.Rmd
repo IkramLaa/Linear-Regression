@@ -1,0 +1,82 @@
+---
+title: "ISYE6501_Homework 5"
+author: "IL"
+date: "9/23/2020"
+output: html_document
+---
+##  Question 8.1 Describe a situation or problem from your job, everyday life, current events, etc., for which a linear regression model would be appropriate. List some (up to 5) predictors that you might use.
+
+I work in energy sector and we have to predict the prices of electricity since most of the utilities in California don't own power generation and they buy electricity from CAISO that manages 4,599 actives node energy market. ISO manages California wholesale electricity.
+As consumer, the price of electricity is fixed, but utilities have some variations of the price and they have to purchase electricity a day ahead to provide balance in the grid. Linear regression helps explain variables that impact the electricity prices. the  5 predictors are: weather, power plants generation, fuel costs, renewable generation, loads.
+
+
+
+Question 8.2
+```{r US crime}
+
+
+UScrime_data = read.table(file="~/Desktop/ISYE6501-\ Introduction\ to\ Analytics\ Modeling/Fall2020hw5/uscrime.txt", header = TRUE,stringsAsFactors = FALSE)
+# The first model including all the predictors 
+model1<- lm(Crime ~., data = UScrime_data)
+summary(model1)
+par(mfrow = c(2, 2), oma = c(0, 0, 2, 0))
+plot(model1)
+SSE<- sum(residuals(model1)^2)
+print(SSE)
+#Predict
+new_data<-data.frame(M = 14.0,So = 0,Ed = 10.0, Po1 = 12.0,Po2 = 15.5,
+                 LF = 0.640, M.F = 94.0,Pop = 150,NW = 1.1,U1 = 0.120,
+                 U2 = 3.6, Wealth = 3200,Ineq = 20.1,Prob = 0.04, Time = 39.0)
+predict.lm(model1,new_data)
+range(UScrime_data$Crime)
+AIC <-AIC(model1)
+print(AIC)
+BIC <-BIC(model1)
+print(BIC)
+Fit<-model1$fitted.values
+(loglik <- logLik(model1))
+p   <- attributes(loglik)$df
+n   <- attributes(loglik)$nobs
+AICc <- AIC + (2 * p^2 + 2 * p)/(47 - p - 1)
+print(AICc)
+#cook's distance to identify outliers 
+plot(model1, pch = 18, col ="red", which = c(4))
+
+#The second model exclude the outliers
+model2 = lm(UScrime_data[-c(11, 19,37),], formula=Crime ~. )
+summary(model2)
+SSE2 <- sum(residuals(model2)^2)
+print(SSE2)
+AIC_2 <-AIC(model2)
+print(AIC_2)
+BIC_2<-BIC(model2)
+print(BIC_2)
+predict.lm(model2,new_data)
+# The third model: redo the model and exclude So, Po1,Po2,LF,M.F, Pop, NW, U1, Wealth, Time due to their high p-value from the
+model3<- lm(Crime ~M+Ed+U2+Ineq+Prob, data = UScrime_data)
+summary(model3)
+predict(model3,new_data)
+SSE3 <- sum(residuals(model3)^2)
+print(SSE3)
+AIC_3 <-AIC(model3)
+print(AIC_3)
+BIC_3<-BIC(model3)
+print(BIC_3)
+
+
+```
+
+
+## Alnalysis 
+
+For the first model, including all predictors and crime is the response variable, the R-squared is 0.8031 which estimate the variability of the model and the adjusted R squared is 0.7078. The predicted value for for the first model is 155 which is below the minimum value we have in the model for the crime rate and the SSE is 1354946. Another method to help looking at which predictors are not meaningful to the datasets is the p-value; So, Po1,Po2,LF,M.F, Pop, NW, U1, Wealth have passed the 0.05 of p-value treshold. In the second model, I used cook's distance to find outliers within the datasets, which were excluded in the second linear regression model resulting in R-squared is 0.8986, adjusted R-squared is 0.8443, and less predictors that have high p-value than 0.05, the predicted model is 1043.11. The third model, I excluded the higher p-value predictors that were generated in the first model to understand if they were overfitting the model, resulting in R-squared is 0.3565 and adjusted R-squared 0.278, the model produced two predictors that were higher than 0.05 p-value. it is still unclear to have an answer about which predictors affect the model.
+
+Another analysis was tested is using AIC, BIC, and SSE. the first model (all the predictors) is AIC = 650.03, BIC = 681.48, and SSE = 1354945.77, the second model(W/O outliers) is AIC = 580.2, BIC = 610.53, and SSE = 634215, the last model is (excluding predictors with p-value>0.05), AIC = 685.6, BIC = 698.6, and SSE = 4428123. AMong all these results, the smallest AIC indicates better model and acts as a guard against overfitting and the second model also represents small BIC which indicates is very likely better model. if we conclude that the second model is the best due to smallest value of AIC, BIC, and SSE among other values, however the R-squared is higher than any model which indicates overfitting. 
+
+the third model prediction fit our datasets, the adjusted and R-squared are significantly lower than any other models and shows having many variables show some overfitting. Hence, removing attributes from model can give lower Adjusted R-squared but can't help make decision on the quality of the model. In the future weeks of learning, we will be able to use different method to train the model and help us select the right predictors and assess the strength the relationships between variables. 
+
+
+
+
+
+
