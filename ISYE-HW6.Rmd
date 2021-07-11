@@ -1,0 +1,44 @@
+---
+title: "ISYE6502-Homework6"
+output: html_document
+---
+
+```{r Crime}
+UScrime_data = read.table(file="~/Desktop/ISYE6501-\ Introduction\ to\ Analytics\ Modeling/Fall2020hw6/uscrime.txt", header = TRUE,stringsAsFactors = FALSE)
+str(UScrime_data)
+pca<-prcomp(UScrime_data[,-16], center = TRUE, scale=TRUE)
+summary(pca)
+names(pca)
+plot(pca)
+plot(pca,type ="l")
+biplot(pca)
+
+#Because each eigenvalue is roughly the importance of its corresponding eigenvector, the proportion of variance explained is the sum of the eigenvalues of the features you kept divided by the sum of the eigenvalues of all features.
+range(UScrime_data$Crime)
+pca$rotation
+cor(pca$x) #are all orthogonal to each other, 
+crime.pca<-cbind(UScrime_data[,16],data.frame(pca$x[,1:5]))
+colnames(crime.pca)[1] <- "CrimePCA"
+cor(crime.pca)[,1]
+#regression model on first 5 PCs
+model.reg <-lm(CrimePCA~., data = crime.pca)
+summary(model.reg)
+#rotation converts from  PC original value to, Unscaling
+mu <- sapply(UScrime_data[,1:15],mean)
+nComp = 15
+Xhat = pca$x[,1:nComp] %*% t(pca$rotation[,1:nComp]) #Matrix multiplication 
+Xhat = scale(Xhat, center = -mu, scale = FALSE)
+new.city <- data.frame(M= 14.0, So = 0, Ed = 10.0, Po1 = 12.0, Po2 = 15.5,
+                    LF = 0.640, M.F = 94.0, Pop = 150, NW = 1.1, U1 = 0.120, U2 = 3.6, Wealth = 3200, Ineq = 20.1, Prob = 0.040,Time = 39.0)
+pred.data <- data.frame(predict(pca, new.city)) 
+pred <- predict(model.reg, pred.data)
+print(pred)
+```
+## Analysis
+We perform PCA on US crime data  with scaling the variables to have standard deviation. The center and scale components correspond to the mean and std dev of the variables. the rotation matrix provide the principal component loadings. We see that there is 15 distinct principal components. the first principal component explains 40% of the variance in the data, the next explains 18% of the variance, and so forth. the plot explained by each components and the variance. However looking at he scree plot, we see that the first five principal components where there is an elbow. This helps and suggests that there may be little benefit to examine through these 5 Principal components; which we used them to model linear regression which R-squared = 0.6452 and after unscaling the data, the predicted value is 1388.9. Comparing to last week HW, R-squared is 0.671 and prediction is 1304. In conclusion, we can say that PCA helped the deliver approximate accuracy with less number of predictors 
+
+
+
+
+
+
